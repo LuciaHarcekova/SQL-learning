@@ -42,9 +42,9 @@ Output:
 +----------+---------+-------------+----------------+--------------------+-----------------------+
 */
 
-SELECT ROUND(COUNT(A2.player_id) / COUNT(A1.player_id), 2) As fraction 
-FROM Activity A1 
-LEFT OUTER JOIN Activity A2 ON A2.player_id = A1.player_id AND A2.event_date = A1.event_date + 1 
-WHERE (A1.player_id, A1.event_date) IN (
-    SELECT player_id, MIN(event_date) FROM Activity GROUP BY player_id
-    );
+select round(count(distinct player_id)/(select count(distinct player_id) from activity), 2) as fraction
+from activity
+where (player_id, date_sub(event_date, interval 1 day)) 
+in (select player_id, min(event_date) as first_date
+from activity
+group by player_id);
